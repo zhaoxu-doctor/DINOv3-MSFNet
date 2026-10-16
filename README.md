@@ -36,14 +36,16 @@ After downloading the datasets and model weights, the files can be organized as 
 DINOV3-MSFNet/
 ├── BOX/
 ├── configs/
-│ ├── DINOV3-MSFNet.py/
-│ ├── __init__.py/
-│ └── common_cfg.py/
+│ ├── DINOV3-MSFNet.py #set the input path of dataset(MS_ROOT_DIR)
+│ ├── __init__.py
+│ └── common_cfg.py
 ├── datasets/
 ├── dinov3/
 ├── losses/
 ├── models/
 ├── utils/
+│ ├── spatial_split_from_labels.py # split dataset #1/#2 for spatial independence
+│ └── split_dataset_GEO.py # split dataset #3/fintuned dataset
 ├── finetune.py
 ├── hubconf.py
 ├── metrics.py
