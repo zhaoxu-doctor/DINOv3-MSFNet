@@ -5,7 +5,7 @@ import sys
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .Decoder import FeatureEnhancementModule, Decoder_FEM, Decoder_FEM_CSFM, Decoder_CSFM
+from .Decoder import *
 from .ResNet import ResNet50
 from .linear_decoder import LinearHead
 from .lora import LoRA
@@ -79,8 +79,16 @@ class DINOSegmentModule(nn.Module):
             self.decoder = LinearHead(in_ch=embed_dim, n_classes=n_classes)
         elif decoder_type == 'Decoder_ONLYFEM':
             self.decoder = Decoder_FEM(**decoder_kwargs)
+        elif decoder_type == 'Decoder_ONLYFEM_No_MSFD':
+            self.decoder = Decoder_FEM_No_MSFD(**decoder_kwargs)
         elif decoder_type == 'Decoder_ONLYCSFM':
             self.decoder = Decoder_CSFM(**decoder_kwargs)
+        elif decoder_type == 'Decoder_ONLYCSFM_No_MSFD':
+            self.decoder = Decoder_CSFM_No_MSFD(**decoder_kwargs)
+        elif decoder_type == 'Decoder_FEM_CSFM_No_MSFD':
+            self.decoder = Decoder_FEM_CSFM_No_MSFD(**decoder_kwargs)
+        elif decoder_type == 'Decoder_ONLY_MSFD':
+            self.decoder = Decoder_ONLY_MSFD(**decoder_kwargs)
         elif decoder_type == 'Decoder_FEM_CSFM':
             self.decoder = Decoder_FEM_CSFM(**decoder_kwargs)
         else:
@@ -301,8 +309,27 @@ def build_model(
             decoder_type="Decoder_ONLYFEM",
             **kwargs,
         )
-
-    if model_name == 'DINOv3_ONLYCSFM':
+    elif model_name == 'DINOv3_ONLYFEM_No_MSFD':
+        model = DINOSegmentModule(
+            backbone_weights=backbone_weights,
+            n_classes=n_classes,
+            use_lora=use_lora,
+            r=r,
+            adapter_type="FEM",
+            decoder_type="Decoder_ONLYFEM_No_MSFD",
+            **kwargs,
+        )
+    elif model_name == 'DINOv3_ONLYCSFM_No_MSFD':
+        model = DINOSegmentModule(
+            backbone_weights=backbone_weights,
+            n_classes=n_classes,
+            use_lora=use_lora,
+            r=r,
+            adapter_type=None,
+            decoder_type="Decoder_ONLYCSFM_No_MSFD",
+            **kwargs,
+        )
+    elif model_name == 'DINOv3_ONLYCSFM':
         model = DINOSegmentModule(
             backbone_weights=backbone_weights,
             n_classes=n_classes,
@@ -312,7 +339,27 @@ def build_model(
             decoder_type="Decoder_ONLYCSFM",
             **kwargs,
         )
-    if model_name == 'DINOv3_FEM_CSFM':
+    elif model_name == 'DINOv3_FEM_CSFM_No_MSFD':
+        model = DINOSegmentModule(
+            backbone_weights=backbone_weights,
+            n_classes=n_classes,
+            use_lora=use_lora,
+            r=r,
+            adapter_type="FEM",
+            decoder_type="Decoder_FEM_CSFM_No_MSFD",
+            **kwargs,
+        )
+    elif model_name == 'DINOv3_ONLY_MSFD':
+        model = DINOSegmentModule(
+            backbone_weights=backbone_weights,
+            n_classes=n_classes,
+            use_lora=use_lora,
+            r=r,
+            adapter_type=None,
+            decoder_type="Decoder_ONLY_MSFD",
+            **kwargs,
+        )
+    elif model_name == 'DINOv3_FEM_CSFM':
         model = DINOSegmentModule(
             backbone_weights=backbone_weights,
             n_classes=n_classes,
