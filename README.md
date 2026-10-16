@@ -34,12 +34,20 @@ After downloading the datasets and model weights, the files can be organized as 
 
 ```text
 DINOV3-MSFNet/
+├── BOX/
+├── configs/
+│ ├── DINOV3-MSFNet.py/
+│ ├── __init__.py/
+│ └── common_cfg.py/
 ├── datasets/
-│ ├── Dataset1/
-│ ├── Dataset2/
-│ └── Dataset3/
+├── dinov3/
+├── losses/
 ├── models/
 ├── utils/
+├── finetune.py
+├── hubconf.py
+├── metrics.py
+├── requirements.txt
 ├── train.py
 ├── test.py
 └── README.md
@@ -72,6 +80,7 @@ The complete citation information will be updated after publication.
 ## Acknowledgements
 
 We sincerely thank the authors and contributors of the publicly available datasets and open-source projects used in this work.
+30m分辨率中国沼泽湿地空间分布数据集(2015年):https://www.geodata.cn/home/Orderdetail.html
 
 ## Contact
 
