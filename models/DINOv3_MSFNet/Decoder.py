@@ -273,6 +273,28 @@ class FeatureFusionModule(nn.Module):
 
         return c_out
 
+class Decoder_FEM_No_MSFD(nn.Module):
+
+    def __init__(
+        self,
+        n_classes,
+        in_channels=[256, 512, 1024, 1024],
+        out_channels=256,
+    ):
+        super().__init__()
+
+        self.in_channels = in_channels  # 1024
+        self.out_channels = out_channels  # 1024 // 8 = 128
+        self.proj = nn.Conv2d(in_channels[3], n_classes, 1)
+        self.up = nn.Upsample(scale_factor=2,
+                              mode="bilinear",
+                              align_corners=False)
+
+    def forward(self, *modalities):
+        x = modalities[0]
+        features = x
+        return self.up(self.proj(features[3]))  # 输入分辨率的logits
+
 class Decoder_FEM(nn.Module):
 
     def __init__(
@@ -280,6 +302,113 @@ class Decoder_FEM(nn.Module):
         n_classes,
         in_channels=[256, 512, 1024, 1024],
         out_channels=256,
+    ):
+        super().__init__()
+
+        self.in_channels = in_channels  # 1024
+        self.out_channels = out_channels  # 1024 // 8 = 128
+        self.out = MSFD(n_classes)
+
+    def forward(self, *modalities):
+        x = modalities[0]
+        features = x
+
+        out = self.out(features[0],features[1],features[2],features[3])
+        return out
+
+class Decoder_CSFM_No_MSFD(nn.Module):
+
+    def __init__(
+        self,
+        n_classes,
+        in_channels=[256, 512, 1024, 1024],
+        out_channels=256,
+    ):
+        super().__init__()
+
+        self.in_channels = in_channels  # 1024
+        self.out_channels = out_channels  # 1024 // 8 = 128
+
+        # TODO: change the input channels
+        self.CSFM = CrossScaleFeatureModule([in_channels[0]] + in_channels,
+                                              out_channels)
+
+        #self.out_conv = ConvBNReLU(out_channels, n_classes, 1, pad=0)
+        self.proj = nn.Conv2d(in_channels[3], n_classes, 1)
+        self.up = nn.Upsample(scale_factor=2,
+                              mode="bilinear",
+                              align_corners=False)
+
+    def forward(self, *modalities):
+        x = modalities[0]
+        features = self.CSFM(*x)
+        x1, x2, x3, x4 = features
+
+        return self.up(self.proj(x4))
+
+class Decoder_CSFM(nn.Module):
+
+    def __init__(
+            self,
+            n_classes,
+            in_channels=[256, 512, 1024, 1024],
+            out_channels=256,
+    ):
+        super().__init__()
+
+        self.in_channels = in_channels  # 1024
+        self.out_channels = out_channels  # 1024 // 8 = 128
+
+        # TODO: change the input channels
+        self.CSFM = CrossScaleFeatureModule([in_channels[0]] + in_channels,
+                                            out_channels)
+
+        self.out = MSFD(n_classes)
+
+    def forward(self, *modalities):
+        x = modalities[0]
+        features = self.CSFM(*x)
+
+        out = self.out(features[0],features[1],features[2],features[3])
+        return out
+
+class Decoder_FEM_CSFM_No_MSFD(nn.Module):
+
+    def __init__(
+        self,
+        n_classes,
+        in_channels=[256, 512, 1024, 1024],
+        out_channels=256,
+    ):
+        super().__init__()
+
+        self.in_channels = in_channels  # 1024
+        self.out_channels = out_channels  # 1024 // 8 = 128
+
+        # TODO: change the input channels
+        self.CSFM = CrossScaleFeatureModule([in_channels[0]] + in_channels,
+                                              out_channels)
+
+        #self.out_conv = ConvBNReLU(out_channels, n_classes, 1, pad=0)
+        self.proj = nn.Conv2d(in_channels[3], n_classes, 1)
+        self.up = nn.Upsample(scale_factor=2,
+                              mode="bilinear",
+                              align_corners=False)
+
+    def forward(self, *modalities):
+        x = modalities[0]
+        features = self.CSFM(*x)
+        x1, x2, x3, x4 = features
+
+        return self.up(self.proj(x4))
+
+class Decoder_ONLY_MSFD(nn.Module):
+
+    def __init__(
+            self,
+            n_classes,
+            in_channels=[256, 512, 1024, 1024],
+            out_channels=256,
     ):
         super().__init__()
 
@@ -319,40 +448,7 @@ class Decoder_FEM_CSFM(nn.Module):
         out = self.out(features[0],features[1],features[2],features[3])
         return out
 
-class Decoder_CSFM(nn.Module):
 
-    def __init__(
-        self,
-        n_classes,
-        in_channels=[256, 512, 1024, 1024],
-        out_channels=256,
-    ):
-        super().__init__()
-
-        self.in_channels = in_channels  # 1024
-        self.out_channels = out_channels  # 1024 // 8 = 128
-
-        # TODO: change the input channels
-        self.CSFM = CrossScaleFeatureModule([in_channels[0]] + in_channels,
-                                              out_channels)
-
-        self.out_conv = ConvBNReLU(out_channels, n_classes, 1, pad=0)
-
-    def forward(self, *modalities):
-        x = modalities[0]
-        features = self.CSFM(*x)
-        x1, x2, x3, x4 = features
-
-        H, W = x1.shape[2:]
-        p2 = x1
-        for _x in [x2, x3, x4]:
-            p2 = p2 + F.interpolate(
-                _x,
-                size=(H, W),
-                mode="bilinear",
-            )
-
-        return self.out_conv(p2)
 
 
 class DPTHead(nn.Module):
