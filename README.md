@@ -8,9 +8,7 @@ For reproducibility and further research, we provide the datasets and trained mo
 The experimental datasets and model weights used in this work can be downloaded from Baidu Netdisk:
 
 **Baidu Netdisk:**
-https://pan.baidu.com/s/1fCtmpY3KNg6_tsPGgS0OBQ?pwd=1234
-
-**Extraction Code:** `1234`
+ https://pan.baidu.com/s/16BAltaeQll8zJ28FHl-mLg?pwd=MSFN 提取码: MSFN 
 
 The shared folder contains the following resources:
 
@@ -36,6 +34,10 @@ After downloading the datasets and model weights, the files can be organized as 
 
 ```text
 DINOV3-MSFNet/
+├── datasets/
+│ ├── Dataset1/
+│ ├── Dataset2/
+│ └── Dataset3/
 ├── models/
 ├── utils/
 ├── train.py
