@@ -45,7 +45,7 @@ DINOV3-MSFNet/
 ├── models/
 ├── utils/
 │ ├── spatial_split_from_labels.py # split dataset #1/#2 for spatial independence
-│ └── split_dataset_GEO.py # split dataset #3/fintuned dataset
+│ └── split_dataset_GEO.py # spatially split the manually interpreted regional fine-tuning dataset
 ├── finetune.py
 ├── hubconf.py
 ├── metrics.py
